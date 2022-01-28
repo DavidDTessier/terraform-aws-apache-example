@@ -7,7 +7,8 @@ resource "aws_key_pair" "deployer" {
 resource "aws_security_group" "sg_my_server" {
   name        = "sg_my_server"
   description = "My Server Security Group"
-  vpc_id      = var.vpc_id == "" ? data.aws_vpc.default_vpc.id : var.vpc_id
+  vpc_id      = var.vpc_id 
+  // == "" ? data.aws_vpc.default_vpc.id : var.vpc_id
 
   ingress = [{
     description      = "HTTP"
