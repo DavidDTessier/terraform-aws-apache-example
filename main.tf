@@ -4,6 +4,15 @@ resource "aws_key_pair" "deployer" {
   public_key = var.public_key
 }
 
+data "aws_subnet_ids" "vpc_subnets" {
+  vpc_id = var.vpc_id
+}
+
+data "aws_subnet" "vpc_subnet" {
+  count = "${length(data.aws_subnet_ids.vpc_subnets.ids)}"
+  id    = "${tolist(data.aws_subnet_ids.vpc_subnets.ids)[count.index]}"
+}
+
 resource "aws_security_group" "sg_my_server" {
   name        = "sg_my_server"
   description = "My Server Security Group"
@@ -50,7 +59,7 @@ resource "aws_instance" "my_server" {
   instance_type          = var.instance_type
   key_name               = aws_key_pair.deployer.key_name
   vpc_security_group_ids = [aws_security_group.sg_my_server.id]
-
+  subnet_id    = data.aws_subnet.vpc_subnet[0].id
   user_data = data.template_file.user_data.rendered
   tags = {
     Name = var.server_name
